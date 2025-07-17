@@ -16,7 +16,7 @@ def resume(candidate_state) -> str:
     state = graph.get_state(config)
 
     if state.interrupts:
-        response = graph.invoke(Command(resume="Resumed"), config)
+        response = graph.invoke(Command(resume=candidate_state), config)
     else:
         response = "State doesn't exists, can't resume."
 

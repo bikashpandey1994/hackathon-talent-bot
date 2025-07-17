@@ -26,67 +26,73 @@ def request_document(state: CandidateState):
 
 def wait_for_document(state: CandidateState):
     value = interrupt("Waiting for document through mail")
-    return {"state": States.DOCUMENT_REQUESTED, "messages": [value]}
+    return value
 
 def validate_document(state: CandidateState):
-    valid = hr_services.verify_response(state, "document_received")
-    if valid:
+    response = hr_services.verify_document_request_mail(state)
+    if response.match and not response.denied and response.verified:
         return "release_offer"
+    elif response.match and response.denied:
+        return "end_onboarding"
     else:
         return "request_document"
 
 def release_offer(state: CandidateState):
-    print(state["state"])
-    return {"state": "offer_released"}
+    offer_details = hr_services.generate_offer_details(state)
+    mail_sender.send_mail(to=state["email"], type="offer_letter",values=offer_details)
+    return {"state": States.OFFER_RELEASED}
 
 def wait_for_offer_acceptance(state: CandidateState):
-    print(state["state"])
-    return {"state": "offer_accepted"}
+    response = interrupt("Waiting offer acceptance through mail")
+    return response
 
 def validate_offer_acceptance(state: CandidateState):
-        valid = True
-        if valid:
-            return "initiate_bgv"
-        else:
-            return "endOnboarding"
+    response = hr_services.verify_offer_acceptance_mail(state)
+    if response.match and response.accepted:
+        return "initiate_bgv"
+    elif response.match and not response.accepted:
+        return "endOnboarding"
+    else:
+        return "follow_up"
 
 def initiate_bgv(state: CandidateState):
-    print(state["state"])
-    return {"state": "bgv_initiated"}
+    mail_sender.send_mail(to=state["email"], type="initiate_bgv")
+    return {"state": States.BGV_INITIATED}
 
 def wait_for_bgv_completion(state: CandidateState):
-    print(state["state"])
-    return {"state": "bgv_completed"}
+    response = interrupt("Waiting offer BGV result through mail")
+    return response
 
 def validate_bgv(state: CandidateState):
-        valid = True
-        if valid:
-            return "confirm_joining_date"
-        else:
-            return "end_onboarding"
+    response  = hr_services.verify_bgv_mail(state)
+    if response.match and response.passed:
+        return "confirm_joining_date"
+    elif response.match and not response.passed:
+        return "end_onboarding"
+    else:
+        return "follow_up"
 
 def confirm_joining_date(state: CandidateState):
-    print(state["state"])
-    return {"state": "confirm_joining_date"}
+    mail_sender.send_mail(to=state["email"], type="confirm_joining_date")
+    return {"state": States.CONFIRM_JOINING_DATE}
 
 def wait_for_joining_date_confirmation(state: CandidateState):
-    print(state["state"])
-    return {"state": "joining_date_confirmed"}
+    response = interrupt("Waiting for joining date confirmation through mail")
+    return response
 
 def validate_joining_date_confirmation(state: CandidateState):
-        valid = True
-        if valid:
-            return "release_appointment_letter"
-        else:
-            return "confirm_joining_date"
+    response = hr_services.verify_joining_date_confirmation_mail(state)
+    if response.match and response.joining and response.joining_date:
+        return "release_appointment_letter"
+    else:
+        return "confirm_joining_date"
 
 def release_appointment_letter(state: CandidateState):
-    print(state["state"])
-    return {"state": "appointment_letter_released"}   
+    mail_sender.send_mail(to=state["email"], type="appointment_letter")
+    return {"state": States.APPOINTMENT_LETTER_RELEASED}   
 
 def ready_to_join(state: CandidateState):
-    print(state["state"])
-    return {"state": "ready_to_join"}
+    return {"state": States.READY_TO_JOIN}
 
 def end_onboarding(state: CandidateState):
 
@@ -105,8 +111,4 @@ def end_onboarding(state: CandidateState):
         body=body,
         reason=reason
     )
-    return {"state": "onboarding_completed"}
-
-def follow_up(state: CandidateState):
-
-    return {"state": "onboarding_completed"}
+    return {"state": States.END_ONBOARDING}
