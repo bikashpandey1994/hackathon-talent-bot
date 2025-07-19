@@ -6,20 +6,29 @@ import io
 from typing import List
 
 from hr_service.process_flow.hr_graph import create_hr_graph
-from hr_service.process_flow.langgraph_workflow import init, resume
+from hr_service.process_flow.langgraph_workflow import history, init, resume
 from . import document_classifier
 
 app = FastAPI()
+
 
 @app.post("/init")
 async def init_endpoint(input_data: CandidateState):
     result = init(input_data)
     return {"result": result}
 
+
 @app.post("/resume")
 async def resume_endpoint(input_data: CandidateState):
     result = resume(input_data)
     return {"result": result}
+
+
+@app.post("/states")
+async def state_endpoint(input_data: CandidateState):
+    result = history(input_data)
+    return {"result": result}
+
 
 @app.get("/graph")
 async def graph_endpoint():
@@ -30,6 +39,7 @@ async def graph_endpoint():
         media_type="image/png"
     )
 
+
 @app.post("/classify_document")
 async def classify_document_endpoint(file: UploadFile = File(...)):
     # Read image file
@@ -38,10 +48,12 @@ async def classify_document_endpoint(file: UploadFile = File(...)):
     # Preprocess document to get words and boxes
     words, boxes = document_classifier.preprocess_document(image)
     # Extract embeddings
-    embeddings = document_classifier.extract_layoutlmv3_embeddings(image, words, boxes)
+    embeddings = document_classifier.extract_layoutlmv3_embeddings(
+        image, words, boxes)
     # Classify document
     label = document_classifier.classify_document_embeddings(embeddings)
     return {"document_type": label}
+
 
 @app.post("/train_classifier")
 async def train_classifier_endpoint(

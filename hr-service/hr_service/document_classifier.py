@@ -10,9 +10,12 @@ pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tessera
 
 
 # Set apply_ocr=False to allow passing custom words and boxes
-processor = LayoutLMv3Processor.from_pretrained("microsoft/layoutlmv3-base", apply_ocr=False)
-model = LayoutLMv3ForTokenClassification.from_pretrained("microsoft/layoutlmv3-base")
+processor = LayoutLMv3Processor.from_pretrained(
+    "microsoft/layoutlmv3-base", apply_ocr=False)
+model = LayoutLMv3ForTokenClassification.from_pretrained(
+    "microsoft/layoutlmv3-base")
 embedding_model = AutoModel.from_pretrained("microsoft/layoutlmv3-base")
+
 
 def preprocess_document(image):
     """
@@ -41,6 +44,7 @@ def preprocess_document(image):
             boxes.append([x0, y0, x1, y1])
     return words, boxes
 
+
 def extract_layoutlmv3_embeddings(image, words, boxes):
     """
     Extract embeddings from LayoutLMv3 for a given document image, words, and bounding boxes.
@@ -52,14 +56,18 @@ def extract_layoutlmv3_embeddings(image, words, boxes):
         embeddings: torch.Tensor of shape (batch_size, sequence_length, hidden_size)
     """
     # Preprocess the inputs
-    encoding = processor(image, words, boxes=boxes, return_tensors="pt", truncation=True, padding="max_length")
+    encoding = processor(image, words, boxes=boxes,
+                         return_tensors="pt", truncation=True, padding="max_length")
     # Get embeddings from the model
     with torch.no_grad():
         outputs = embedding_model(**encoding)
-        embeddings = outputs.last_hidden_state  # (batch_size, seq_len, hidden_size)
+        # (batch_size, seq_len, hidden_size)
+        embeddings = outputs.last_hidden_state
     return embeddings
 
 # Dummy classifier for demonstration (should be trained with real data)
+
+
 class SimpleDocClassifier(nn.Module):
     def __init__(self, embedding_dim, num_classes=3):
         super().__init__()
@@ -72,9 +80,11 @@ class SimpleDocClassifier(nn.Module):
         logits = self.fc(cls_emb)
         return logits
 
+
 # Instantiate the classifier (embedding_dim=768 for layoutlmv3-base)
 classifier = SimpleDocClassifier(embedding_dim=768)
 # TODO: Load trained weights for real use
+
 
 def classify_document_embeddings(embeddings, threshold=0.33):
     """
@@ -96,6 +106,7 @@ def classify_document_embeddings(embeddings, threshold=0.33):
         if max_prob < threshold:
             return "Unknown"
         return label_map[pred]
+
 
 def train_classifier(image_label_pairs, num_epochs=5, lr=1e-4):
     """
@@ -121,10 +132,12 @@ def train_classifier(image_label_pairs, num_epochs=5, lr=1e-4):
             loss.backward()
             optimizer.step()
             total_loss += loss.item()
-        print(f"Epoch {epoch+1}/{num_epochs}, Loss: {total_loss/len(image_label_pairs):.4f}")
+        print(
+            f"Epoch {epoch+1}/{num_epochs}, Loss: {total_loss/len(image_label_pairs):.4f}")
 
     # Save the trained model
     torch.save(classifier.state_dict(), "simple_doc_classifier.pth")
+
 
 def load_trained_classifier(path="simple_doc_classifier.pth"):
     classifier.load_state_dict(torch.load(path))
