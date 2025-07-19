@@ -110,15 +110,14 @@ def verify_documents(candidateState, response) -> DocumentResponse:
 
 
 def generate_offer_details(candidateState) -> dict:
-    print("Offer letter attributes generated")
-    return {"total_compensation": 1000000,
-            "fixed_compensation": 9000000,
-            "variable_compensation": 100000,
-            "joining_bonus": 100000,
-            "stock_options": 1000,
-            "joining_date": "2024-01-01",
-            "probation_period": 6,
-            "notice_period": 3}
+    
+    offer_details = candidateState.get("joining_details", {})
+    # Additional offer details can be added here
+    offer_details["probation_period"]  = "180 days"
+    offer_details["notice_period"]  = "60 days"
+    
+    print(f"Offer letter attributes generated: {offer_details}")
+    return offer_details
 
 
 def verify_offer_acceptance_mail(candidateState) -> OfferResponse:

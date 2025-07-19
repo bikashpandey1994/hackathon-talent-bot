@@ -5,12 +5,16 @@ from enum import Enum
 
 
 class CandidateState(TypedDict, total=False):
-    messages: Annotated[list[str], add]
+    thread_id: Optional[str]
+    name: str
     email: str
+    mobile_no: str
     status: Optional[str]
     state: Optional["States"]
-    thread_id: Optional[str]
+    messages: Annotated[list[str], add]
     candidate_checkpoint_id: Optional[str]
+    joining_details: Optional[dict]
+    
 
 
 class GraphState(TypedDict):
@@ -36,6 +40,7 @@ class States(Enum):
     JOINING_DATE_CONFIRMED = "JOINING_DATE_CONFIRMED"
     APPOINTMENT_LETTER_RELEASED = "APPOINTMENT_LETTER_RELEASED"
     RECONFIRM_JOINING_DATE = "RECONFIRM_JOINING_DATE"
+    RECONFIRM_RECEIVED = "RECONFIRM_RECEIVED"
     JOINING_DATE_RECONFIRMED = "JOINING_DATE_RECONFIRMED"
     READY_TO_JOIN = "READY_TO_JOIN"
     CANDIDATE_JOINED = "CANDIDATE_JOINED"

@@ -6,26 +6,39 @@ import io
 from typing import List
 
 from hr_service.process_flow.hr_graph import create_hr_graph
-from hr_service.process_flow.langgraph_workflow import history, init, resume
+from hr_service.process_flow.langgraph_workflow import history, init, resume, perform_hr_action, get_state
 from . import document_classifier
+from .models import InitRequest, ResumeRequest, ActionRequest
 
 app = FastAPI()
 
 
 @app.post("/init")
-async def init_endpoint(input_data: CandidateState):
-    result = init(input_data)
+async def init_endpoint(request: InitRequest):
+    result = init(request)
     return {"result": result}
 
 
 @app.post("/resume")
-async def resume_endpoint(input_data: CandidateState):
-    result = resume(input_data)
+async def resume_endpoint(request: ResumeRequest):
+    result = resume(request)
+    return {"result": result}
+
+
+@app.post("/hr-action")
+async def perform_hr_action(request: ActionRequest):
+    result = perform_hr_action(request)
+    return {"result": result}
+
+
+@app.post("/state")
+async def state_endpoint(input_data: CandidateState):
+    result = get_state(input_data)
     return {"result": result}
 
 
 @app.post("/states")
-async def state_endpoint(input_data: CandidateState):
+async def states_endpoint(input_data: CandidateState):
     result = history(input_data)
     return {"result": result}
 

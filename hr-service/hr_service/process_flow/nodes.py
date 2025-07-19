@@ -18,23 +18,27 @@ llm = init_chat_model("gemini-2.0-flash", model_provider="google_genai")
 
 
 def initiate_onboarding(state: CandidateState):
+    # Do initiate onboarding tasks if required here
     return {"state": States.ONBOARDING_INITIATED}
 
 
 def request_document(state: CandidateState):
-
-    mail_sender.send_mail(to=state["email"], type="document_request")
-    return {"state": States.DOCUMENT_REQUESTED}
+    print("Requesting document for state:", state)
+    # find what documents are required here
+    sent_message = mail_sender.send_mail(to=state["email"], type="document_request")
+    #state["messages"].append(sent_message)
+    return {"state": States.DOCUMENT_REQUESTED, "messages": [sent_message]}
 
 
 def wait_for_document(state: CandidateState):
-    value = interrupt("Waiting for document through mail")
-    return value
+    response = interrupt("Waiting for document through mail")
+    return {"messages": response["messages"]}
 
 
 def validate_document(state: CandidateState):
     response = hr_services.verify_document_request_mail(state)
     if response.match and not response.denied and response.verified:
+        state.update({"state": States.DOCUMENT_RECEIVED})
         return "release_offer"
     elif response.match and not response.verified:
         return "request_document"
@@ -44,82 +48,87 @@ def validate_document(state: CandidateState):
 
 def release_offer(state: CandidateState):
     offer_details = hr_services.generate_offer_details(state)
-    mail_sender.send_mail(
+    sent_message = mail_sender.send_mail(
         to=state["email"], type="offer_letter", values=offer_details)
-    return {"state": States.OFFER_RELEASED}
+    return {"state": States.OFFER_RELEASED, "messages": [sent_message]}
 
 
 def wait_for_offer_acceptance(state: CandidateState):
     response = interrupt("Waiting offer acceptance through mail")
-    return response
+    return {"messages": response["messages"]}
 
 
 def validate_offer_acceptance(state: CandidateState):
     response = hr_services.verify_offer_acceptance_mail(state)
     if response.match and response.accepted:
+        state.update({"state": States.OFFER_ACCEPTED})
         return "initiate_bgv"
     elif response.match and not response.accepted:
         return "hr_intervention"
 
 
 def initiate_bgv(state: CandidateState):
-    mail_sender.send_mail(to=state["email"], type="initiate_bgv")
-    return {"state": States.BGV_INITIATED}
+    sent_message = mail_sender.send_mail(to=state["email"], type="initiate_bgv")
+    return {"state": States.BGV_INITIATED, "messages": [sent_message]}
 
 
 def wait_for_bgv_completion(state: CandidateState):
     response = interrupt("Waiting offer BGV result through mail")
-    return response
+    return {"messages": response["messages"]}
 
 
 def validate_bgv(state: CandidateState):
     response = hr_services.verify_bgv_mail(state)
     if response.match and response.passed:
+        state.update({"state": States.BGV_COMPLETED})
         return "confirm_joining_date"
     elif response.match and not response.passed:
         return "hr_intervention"
 
 
 def confirm_joining_date(state: CandidateState):
-    mail_sender.send_mail(to=state["email"], type="confirm_joining_date")
-    return {"state": States.CONFIRM_JOINING_DATE}
+    sent_message = mail_sender.send_mail(to=state["email"], type="confirm_joining_date")
+    return {"state": States.CONFIRM_JOINING_DATE, "messages": [sent_message]}
 
 
 def wait_for_joining_date_confirmation(state: CandidateState):
     response = interrupt("Waiting for joining date confirmation through mail")
-    return response
+    return {"messages": response["messages"]}
 
 
 def validate_joining_date_confirmation(state: CandidateState):
     response = hr_services.verify_joining_date_confirmation_mail(state)
     if response.match and response.joining and response.confirmed:
+        #state.update({"state": States.JOINING_DATE_CONFIRMED})
+        state["state"] = States.JOINING_DATE_CONFIRMED
         return "release_appointment_letter"
     else:
         return "hr_intervention"
 
 
 def release_appointment_letter(state: CandidateState):
-    mail_sender.send_mail(to=state["email"], type="appointment_letter")
-    return {"state": States.APPOINTMENT_LETTER_RELEASED}
+    sent_message = mail_sender.send_mail(to=state["email"], type="appointment_letter")
+    return {"state": States.APPOINTMENT_LETTER_RELEASED, "messages": [sent_message]}
 
-
+# will be called 7 days before joining date by a scheduler
 def reconfirm_joing_date(state: CandidateState):
     response = interrupt(
         "Waiting for sending joining date re-confirmation seven days before joining")
-    mail_sender.send_mail(to=state["email"], type="appointment_letter")
-    return {"state": States.RECONFIRM_JOINING_DATE}
+    sent_message = mail_sender.send_mail(to=state["email"], type="reconfirm_joing_date")
+    return {"state": States.RECONFIRM_JOINING_DATE, "messages": [sent_message]}
 
 
 def wait_for_reconfirmation_of_joing_date(state: CandidateState):
     response = interrupt(
         "Waiting for joining date re-confirmation through mail")
-    return response
+    return {"state": States.RECONFIRM_RECEIVED, "messages": response["messages"]}
 
 
 def verify_reconfirmation_of_joing_date(state: CandidateState):
     response = hr_services.verify_reconfirmation_of_joining_date_mail(state)
 
     if response.match and response.joining and response.confirmed:
+        state.update({"state": States.JOINING_DATE_RECONFIRMED})
         return "ready_to_join"
     else:
         return "hr_intervention"
@@ -131,7 +140,7 @@ def ready_to_join(state: CandidateState):
 
 def candidate_joined(state: CandidateState):
     response = interrupt("Waiting for HR to mark candidate has joined or not")
-    if response["state"] == "joined":
+    if response["state"] == "CANDIDATE_JOINED":
         mail_sender.send_mail(
             to=state["email"],
             subject="Welcome to the Company",
@@ -152,22 +161,7 @@ def candidate_joined(state: CandidateState):
 
 
 def end_onboarding(state: CandidateState):
-
-    if state["status"] == "success":
-        subject = "Onboarding Complete"
-        body = "You are now ready to join the company."
-        reason = "Onboarding Complete"
-    else:
-        subject = "Onboarding Failed"
-        body = "Unfortunately, your onboarding process has failed. Please contact HR for further assistance."
-        reason = "Onboarding Failed"
-
-    mail_sender.send_mail(
-        to=state["email"],
-        subject=subject,
-        body=body,
-        reason=reason
-    )
+    # Do any cleanup or finalization tasks her
     return {"state": States.END_ONBOARDING}
 
 

@@ -44,7 +44,6 @@ def create_hr_graph() -> StateGraph:
     builder.add_node(release_appointment_letter)
     builder.add_node(reconfirm_joing_date)
     builder.add_node(wait_for_reconfirmation_of_joing_date)
-    builder.add_node(verify_reconfirmation_of_joing_date)
     builder.add_node(ready_to_join)
     builder.add_node(end_onboarding)
     builder.add_node(candidate_joined)
@@ -98,13 +97,7 @@ def create_hr_graph() -> StateGraph:
     builder.add_edge("candidate_joined", "end_onboarding")
 
     builder.add_edge("hr_intervention", "hr_action")
-    builder.add_conditional_edges(
-        "hr_action",
-        hr_action,
-        {"initiate_onboarding": "initiate_onboarding",
-            "request_document": "request_document",
-            "end_onboarding": "end_onboarding", }
-    )
+    builder.add_edge("hr_action", "end_onboarding")
     builder.add_edge("end_onboarding", END)
 
     graph = builder.compile(
