@@ -1,13 +1,13 @@
 from typing import List
 
 from hr_service.process_flow.states import GraphState
-from . import hr_graph
+from . import onboarding_graph
 from langgraph.types import interrupt, Command
 
 
 def init(request) -> str:
 
-    graph = hr_graph.get_hr_graph()
+    graph = onboarding_graph.get_onboarding_graph()
     config = {"configurable": {"thread_id": request["thread_id"]}}
 
     candidate_state = {
@@ -31,12 +31,13 @@ def resume(request) -> str:
         "thread_id": request["thread_id"]
     }
     }
-    graph = hr_graph.get_hr_graph()
+    graph = onboarding_graph.get_onboarding_graph()
     state = graph.get_state(config)
 
     candidate_state = {
         "state": request.get("state"),
         "messages": request.get("messages", []),
+        "docs": request.get("docs", []),
     }
 
     if state:
@@ -54,7 +55,7 @@ def perform_hr_action(candidate_state) -> str:
         "checkpoint_id": candidate_state["candidate_checkpoint_id"]
     }
     }
-    graph = hr_graph.get_hr_graph()
+    graph = onboarding_graph.get_onboarding_graph()
     response = graph.invoke(Command(resume=candidate_state), config)
 
     return response
@@ -62,7 +63,7 @@ def perform_hr_action(candidate_state) -> str:
 
 def get_state(candidate_state) -> GraphState:
 
-    graph = hr_graph.get_hr_graph()
+    graph = onboarding_graph.get_onboarding_graph()
     config = {"configurable": {"thread_id": candidate_state["thread_id"]}}
     state = graph.get_state(config)
 
@@ -84,7 +85,7 @@ def get_state(candidate_state) -> GraphState:
 
 def history(candidate_state) -> List[GraphState]:
 
-    graph = hr_graph.get_hr_graph()
+    graph = onboarding_graph.get_onboarding_graph()
     config = {"configurable": {"thread_id": candidate_state["thread_id"]}}
     states = list(graph.get_state_history(config))
 

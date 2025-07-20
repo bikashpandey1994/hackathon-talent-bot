@@ -17,6 +17,7 @@ class ResumeRequest(TypedDict, total=False):
     thread_id: Optional[str]
     state: Optional[States]  # <-- Use States, not "States"
     messages: Optional[list[str]]
+    docs: Optional[list[str]]
 
 class ActionRequest(TypedDict, total=False):
     thread_id: Optional[str]

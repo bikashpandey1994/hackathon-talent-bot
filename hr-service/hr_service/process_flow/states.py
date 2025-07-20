@@ -14,6 +14,7 @@ class CandidateState(TypedDict, total=False):
     messages: Annotated[list[str], add]
     candidate_checkpoint_id: Optional[str]
     joining_details: Optional[dict]
+    docs: Optional[list[str]]
     
 
 
@@ -26,6 +27,12 @@ class GraphState(TypedDict):
     parent_config: Optional[str]
     tasks: Optional[list[str]]
     interrupts: Optional[list[str]]
+    
+class QueryState(TypedDict):
+    candidate_state: CandidateState
+    context: Optional[str]
+    query: Optional[str]
+    answer: Optional[str]
 
 
 class States(Enum):

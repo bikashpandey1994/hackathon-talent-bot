@@ -5,11 +5,13 @@ from langchain.chat_models import init_chat_model
 from langchain_core.prompts import ChatPromptTemplate
 from pydantic import BaseModel, Field
 
+from .. import llm_document_classifier
+
+
 if not os.environ.get("GOOGLE_API_KEY"):
     os.environ["GOOGLE_API_KEY"] = "AIzaSyCiAGnly6Bg8PrfHwF5RCJaFEjLZHDf9Uc"
 
 llm = init_chat_model("gemini-2.0-flash", model_provider="google_genai")
-
 
 class DocumentResponse(BaseModel):
     match: bool = Field(
@@ -72,8 +74,8 @@ class JoiningDateResponse(BaseModel):
 def verify_document_request_mail(candidateState) -> DocumentResponse:
 
     response = verify_context(candidateState)
-    if response.match:
-        response = verify_documents(candidateState, response)
+    #if response.match:
+    response = verify_documents(candidateState, response)
     return response
 
 
@@ -94,20 +96,19 @@ def verify_context(candidateState) -> DocumentResponse:
     response = pipeline.invoke(
         input="Sent mail: " + second_last_message + "\nReceived mail: " + last_message)
 
-    print(f"Document Request Mail Response from LLM: {response}")
-
     return response
 
 
 def verify_documents(candidateState, response) -> DocumentResponse:
-    print("Verifying documents...")
-    # TODO: Implement the logic to verify documents
-    # 1. Check if the received email contains any attachments.
-    # 2. If attachments are present, verify their content.
-    # 3. If no attachments are present, set response.verified to False.
-    response.verified = True
+    documents_required = ["Aadhar Card","Pan Card", "Passport", "Payslip", "Compensation Letter"]
+    for doc in candidateState["docs"]:
+        document = llm_document_classifier.verify_document(doc)
+        print(f"Removing Document : {document.category.value}")
+        documents_required.remove(document.category.value)
+    
+    if not documents_required:
+        response.verified = True
     return response
-
 
 def generate_offer_details(candidateState) -> dict:
     
@@ -116,7 +117,6 @@ def generate_offer_details(candidateState) -> dict:
     offer_details["probation_period"]  = "180 days"
     offer_details["notice_period"]  = "60 days"
     
-    print(f"Offer letter attributes generated: {offer_details}")
     return offer_details
 
 
@@ -136,8 +136,6 @@ def verify_offer_acceptance_mail(candidateState) -> OfferResponse:
 
     response = pipeline.invoke(
         input="Sent mail: " + second_last_message + "\nReceived mail: " + last_message)
-
-    print(f"Offer Request Mail Response from LLM: {response}")
 
     return response
 
@@ -159,8 +157,6 @@ def verify_bgv_mail(candidateState) -> BGVResponse:
     response = pipeline.invoke(
         input="Sent mail: " + second_last_message + "\nReceived mail: " + last_message)
 
-    print(f"BGV Request Mail Response from LLM: {response}")
-
     return response
 
 
@@ -181,8 +177,6 @@ def verify_joining_date_confirmation_mail(candidateState) -> JoiningDateResponse
     response = pipeline.invoke(
         input="Sent mail: " + second_last_message + "\nReceived mail: " + last_message)
 
-    print(f"Joining Date Confirmation Mail Response from LLM: {response}")
-
     return response
 
 
@@ -202,7 +196,5 @@ def verify_reconfirmation_of_joining_date_mail(candidateState) -> JoiningDateRes
 
     response = pipeline.invoke(
         input="Sent mail: " + second_last_message + "\nReceived mail: " + last_message)
-
-    print(f"Reconfirmation of Joining Date Mail Response from LLM: {response}")
 
     return response

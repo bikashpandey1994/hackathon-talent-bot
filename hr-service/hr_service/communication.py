@@ -8,7 +8,7 @@ class MailSenderProtocol(Protocol):
 
 class SimpleMailSender:
     def send_mail(self, type: str = "", to: str = "", subject: str = "", body: str = "", reason: str = "", values: dict = {}) -> str:
-        print(f"Sending mail to {to} for reason '{reason}': {subject}\n{body}")
+        #print(f"Sending mail to {to} for reason '{reason}': {subject}\n{body}")
         if "document_request" == type:
             return "Dear [Candidate's Name],\n\nWe’re pleased to inform you that you’ve been selected for the position of [Job Title] following your recent interview with us at [Company Name]. Congratulations!\n\nTo move forward with the onboarding process, we kindly request you to share the following documents at your earliest convenience:\n\n- Government-issued ID (e.g., Aadhaar, Passport, PAN)\n- Latest educational certificates\n- Previous employment documents (if applicable)\n- Passport-sized photograph\n- Any other documents as discussed during the interview\n\nPlease send scanned copies to [Your Email Address] by [Mention Deadline], so we can initiate the next steps without delay.\n\nShould you have any questions or need assistance, feel free to reach out.\n\nLooking forward to welcoming you aboard!\n\nWarm regards,\nHR Department\nLloyds Technology Center\nHyderabad"
         elif "offer_letter" == type:

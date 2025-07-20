@@ -5,10 +5,18 @@ from PIL import Image as PilImage
 import io
 from typing import List
 
-from hr_service.process_flow.hr_graph import create_hr_graph
+from hr_service.process_flow.onboarding_graph import create_onboarding_graph
 from hr_service.process_flow.langgraph_workflow import history, init, resume, perform_hr_action, get_state
-from . import document_classifier
+# from . import document_classifier
+from . import llm_document_classifier
 from .models import InitRequest, ResumeRequest, ActionRequest
+import os
+
+if not os.environ.get("OCR_AGENT"):
+    os.environ["OCR_AGENT"] = "unstructured.partition.utils.ocr_models.tesseract_ocr.OCRAgentTesseract"
+    
+if not os.environ.get("GOOGLE_API_KEY"):
+    os.environ["GOOGLE_API_KEY"] = "AIzaSyCiAGnly6Bg8PrfHwF5RCJaFEjLZHDf9Uc"
 
 app = FastAPI()
 
@@ -45,12 +53,17 @@ async def states_endpoint(input_data: CandidateState):
 
 @app.get("/graph")
 async def graph_endpoint():
-    graph = create_hr_graph()
+    graph = create_onboarding_graph()
     img_bytes = graph.get_graph().draw_mermaid_png()
     return StreamingResponse(
         iter([img_bytes]),
         media_type="image/png"
     )
+
+@app.post("/classify_doc")
+async def classify_document(doc_id:str):
+    result = llm_document_classifier.verify_document(doc_id)
+    return {"result": result}
 
 
 @app.post("/classify_document")
