@@ -1,0 +1,73 @@
+.header-root {
+  display: flex;
+  align-items: center;
+  background: #1a914b;
+  color: #fff;
+  padding: 1rem;
+  position: relative;
+}
+.header-hamburger {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 2rem;
+  cursor: pointer;
+  margin-right: 1rem;
+}
+.header-title {
+  margin: 0;
+  font-size: 1.5rem;
+  flex: none;
+}
+.header-searchbar-container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+.header-notification-icon {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+.header-notification-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.2rem 0.5rem;
+  display: flex;
+  align-items: center;
+}
+.header-notification-btn svg {
+  display: block;
+}
+.header-notification-dropdown {
+  position: absolute;
+  top: 2.5rem;
+  right: 0;
+  min-width: 220px;
+  background: #fff;
+  color: #219150;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(33,145,80,0.18);
+  z-index: 2000;
+  font-size: 1rem;
+}
+.header-notification-dropdown-content {
+  padding: 0.7rem 1rem;
+  max-height: 260px;
+  overflow-y: auto;
+}
+.header-notification-item {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+.header-notification-item:last-child {
+  border-bottom: none;
+}
+.header-notification-loading,
+.header-notification-empty {
+  color: #888;
+  padding: 0.7rem 0;
+  text-align: center;
+}

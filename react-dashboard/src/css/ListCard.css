@@ -1,0 +1,225 @@
+.listcard-root {
+  background: #e8f5e9;
+  border-radius: 6px;
+  box-shadow: 0 1px 4px rgba(33,145,80,0.10);
+  padding: 0.3rem 0.7rem;
+  min-width: 180px;
+  max-width: 100%;
+  cursor: pointer;
+  transition: box-shadow 0.2s;
+  flex-wrap: wrap;
+  position: relative;
+}
+.listcard-root.expanded {
+  box-shadow: 0 4px 16px rgba(33,145,80,0.18);
+  z-index: 10;
+}
+.listcard-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  padding: 0.5em;
+}
+.listcard-row-expanded {
+  margin-top: 0.5rem;
+  border-top: 1px solid #b2dfdb;
+  padding-top: 0.5em;
+  flex-direction: row;
+  width: 100%;
+  background: #e8f5e9;
+  border-radius: 6px;
+}
+.listcard-col {
+  flex: 1;
+  min-width: 0;
+  text-align: center;
+}
+.listcard-label {
+  font-weight: 600;
+  color: #219150;
+  font-size: 0.95rem;
+}
+.listcard-value {
+  font-size: 0.95rem;
+}
+.listcard-expanded {
+  color: #333;
+  background: #e8f5e9;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(33,145,80,0.10);
+  padding: 0.7rem 0.5rem;
+  position: relative;
+  z-index: 11;
+}
+.listcard-expanded-push {
+  /* Ensure it takes up space and pushes cards below */
+  display: block;
+  width: 100%;
+}
+.listcard-actions {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  min-width: 70px;
+  gap: 0.3rem;
+}
+.listcard-action-btn,
+.listcard-view-btn {
+  background: #219150;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 0.3rem 0.7rem;
+  margin: 0.1rem 0;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.listcard-action-btn:hover,
+.listcard-view-btn:hover {
+  background: #17693b;
+}
+.listcard-popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(33,145,80,0.18);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.listcard-popup {
+  /* width and background overridden inline in JS */
+  border-radius: 10px;
+  box-shadow: 0 4px 24px rgba(33,145,80,0.18);
+  padding: 2rem 1.5rem 1.5rem 1.5rem;
+  min-width: 320px;
+  max-width: 95vw;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+}
+.listcard-popup-close {
+  position: absolute;
+  top: 0.7rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: #219150;
+  cursor: pointer;
+}
+.listcard-popup-conversations {
+  margin-top: 0.5em;
+  padding-left: 0.5em;
+}
+.listcard-popup-conv {
+  margin-bottom: 0.5em;
+  padding: 0.4em 0.2em;
+  border-bottom: 1px solid #e0e0e0;
+  font-size: 0.97em;
+}
+.listcard-status-flow {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin: 1.2em 0 1.5em 0;
+  flex-wrap: wrap;
+  gap: 0.5em;
+}
+.listcard-status-step {
+  padding: 0.4em 1em;
+  border-radius: 20px;
+  background: #f1f8e9;
+  color: #219150;
+  font-weight: 600;
+  border: 2px solid #b2dfdb;
+  font-size: 1em;
+  transition: background 0.2s, color 0.2s;
+}
+.listcard-status-step.current {
+  background: #219150;
+  color: #fff;
+  border-color: #219150;
+}
+.listcard-status-arrow {
+  font-size: 1.3em;
+  color: #b2dfdb;
+  margin: 0 0.2em;
+}
+
+/* Responsive styles for small screens */
+@media (max-width: 600px) {
+  .listcard-root {
+    padding: 0.2rem 0.3rem;
+    min-width: 0;
+    font-size: 0.95rem;
+  }
+  .listcard-row {
+    flex-direction: column;
+    gap: 0.2rem;
+    padding: 0.3em;
+  }
+  .listcard-col {
+    text-align: left;
+    padding: 0.1em 0;
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+  .listcard-actions {
+    flex-direction: row;
+    justify-content: flex-start;
+    min-width: 0;
+    gap: 0.2rem;
+    margin-top: 0.3rem;
+    width: 100%;
+  }
+  .listcard-action-btn,
+  .listcard-view-btn {
+    padding: 0.2rem 0.5rem;
+    font-size: 1rem;
+    width: 48%;
+    min-width: 80px;
+    margin: 0.1rem 0.1rem 0.1rem 0;
+  }
+  .listcard-popup {
+    width: 98vw !important;
+    min-width: 0;
+    padding: 1rem 0.5rem 1rem 0.5rem;
+    border-radius: 8px;
+  }
+  .listcard-popup-close {
+    right: 0.5rem;
+    top: 0.5rem;
+    font-size: 1.5rem;
+  }
+}
+
+/* Extra: make sure popup content stacks vertically and is readable */
+@media (max-width: 600px) {
+  .listcard-popup {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .listcard-popup h3,
+  .listcard-popup h4 {
+    font-size: 1.1rem;
+    margin-top: 0.7em;
+    margin-bottom: 0.5em;
+  }
+  .listcard-popup div {
+    font-size: 0.98rem;
+    word-break: break-word;
+  }
+}
