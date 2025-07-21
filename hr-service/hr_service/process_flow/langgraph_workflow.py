@@ -48,13 +48,19 @@ def resume(request) -> str:
     return response
 
 
-def perform_hr_action(candidate_state) -> str:
+def perform_action(request) -> str:
 
     config = {"configurable": {
-        "thread_id": candidate_state["thread_id"],
-        "checkpoint_id": candidate_state["candidate_checkpoint_id"]
+        "thread_id": request.get("thread_id"),
+        "checkpoint_id": request.get("candidate_checkpoint_id", "")
     }
     }
+    
+    candidate_state = {
+        "hr_message": request.get("hr_message"),
+        "hr_nextnode": request.get("hr_nextnode")
+    }
+        
     graph = onboarding_graph.get_onboarding_graph()
     response = graph.invoke(Command(resume=candidate_state), config)
 

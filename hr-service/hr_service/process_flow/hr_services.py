@@ -108,6 +108,8 @@ def verify_documents(candidateState, response) -> DocumentResponse:
     
     if not documents_required:
         response.verified = True
+    else:
+        response.verified = False
     return response
 
 def generate_offer_details(candidateState) -> dict:

@@ -23,8 +23,7 @@ from hr_service.process_flow.nodes import (
     verify_reconfirmation_of_joing_date,
     ready_to_join,
     candidate_joined,
-    hr_intervention,
-    hr_action
+    hr_intervention
 )
 
 
@@ -49,7 +48,6 @@ def create_onboarding_graph() -> StateGraph:
     builder.add_node(candidate_joined)
 
     builder.add_node(hr_intervention)
-    builder.add_node(hr_action)
 
     builder.add_edge(START, "initiate_onboarding")
     builder.add_edge("initiate_onboarding", "request_document")
@@ -96,8 +94,6 @@ def create_onboarding_graph() -> StateGraph:
     builder.add_edge("ready_to_join", "candidate_joined")
     builder.add_edge("candidate_joined", "end_onboarding")
 
-    builder.add_edge("hr_intervention", "hr_action")
-    builder.add_edge("hr_action", "end_onboarding")
     builder.add_edge("end_onboarding", END)
 
     graph = builder.compile(

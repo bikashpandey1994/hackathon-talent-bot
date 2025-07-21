@@ -22,7 +22,7 @@ class SimpleMailSender:
         elif "reconfirm_joing_date" == type:
             return "Dear [Candidate's Name],\n\nWe hope you're doing well.\n\nThis is a gentle reminder to reconfirm your joining date for the position of [Job Title] at [Company Name], scheduled for [Confirmed Start Date]. We are looking forward to welcoming you and beginning a rewarding journey together.\n\nPlease respond to this email confirming your availability, and let us know if you have any queries regarding the reporting details, onboarding documents, or other formalities.\n\nDetails:\n- Position: [Job Title]\n- Joining Date: [Confirmed Start Date]\n- Reporting Time & Location: [Time], [Office Address or Virtual Instructions]\n\nWishing you a smooth transition, and we’re excited to have you onboard!\n\nWarm regards,\n[Your Full Name]\nHR Team\n[Company Name]\n[Contact Information]"
         else:
-            return "Mail sent successfully."
+            return body
 
 
 mail_sender: MailSenderProtocol = SimpleMailSender()

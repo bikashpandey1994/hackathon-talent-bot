@@ -24,7 +24,12 @@ def initiate_onboarding(state: CandidateState):
 
 
 def request_document(state: CandidateState):
-    # find what documents are required here
+
+    if "hr_action" in state and state["hr_action"]:
+        sent_message = mail_sender.send_mail(
+            to=state["email"], body=state["hr_message"])
+        return {"state": States.DOCUMENT_REQUESTED, "messages": [sent_message], "hr_message": "", "hr_action": False, "hr_nextnode": ""}
+
     sent_message = mail_sender.send_mail(
         to=state["email"], type="document_request")
     return {"state": States.DOCUMENT_REQUESTED, "messages": [sent_message]}
@@ -38,20 +43,23 @@ def wait_for_document(state: CandidateState):
 def validate_document(state: CandidateState):
     response = hr_services.verify_document_request_mail(state)
 
-    if response.query:
-        prepare_answer_for_candidate_query(state, response.query)
-        
-    print(f"Document Response : {response}")
+    # if response.query:
+    # prepare_answer_for_candidate_query(state, response.query)
+
     if response.match and not response.denied and response.verified:
         state.update({"state": States.DOCUMENT_RECEIVED})
         return "release_offer"
-    elif response.match and not response.verified:
-        return "request_document"
     else:
         return "hr_intervention"
 
 
 def release_offer(state: CandidateState):
+    
+    if "hr_action" in state and state["hr_action"]:
+        sent_message = mail_sender.send_mail(
+            to=state["email"], body=state["hr_message"])
+        return {"state": States.OFFER_RELEASED, "messages": [sent_message], "hr_message": "", "hr_action": False, "hr_nextnode": ""}
+    
     offer_details = hr_services.generate_offer_details(state)
     sent_message = mail_sender.send_mail(
         to=state["email"], type="offer_letter", values=offer_details)
@@ -66,13 +74,13 @@ def wait_for_offer_acceptance(state: CandidateState):
 def validate_offer_acceptance(state: CandidateState):
     response = hr_services.verify_offer_acceptance_mail(state)
 
-    if response.query:
-        prepare_answer_for_candidate_query(state, response.query)
+    # if response.query:
+    # prepare_answer_for_candidate_query(state, response.query)
 
     if response.match and response.accepted:
         state.update({"state": States.OFFER_ACCEPTED})
         return "initiate_bgv"
-    elif response.match and not response.accepted:
+    else:
         return "hr_intervention"
 
 
@@ -90,8 +98,8 @@ def wait_for_bgv_completion(state: CandidateState):
 def validate_bgv(state: CandidateState):
     response = hr_services.verify_bgv_mail(state)
 
-    if response.query:
-        prepare_answer_for_candidate_query(state, response.query)
+    # if response.query:
+    # prepare_answer_for_candidate_query(state, response.query)
 
     if response.match and response.passed:
         state.update({"state": States.BGV_COMPLETED})
@@ -101,6 +109,12 @@ def validate_bgv(state: CandidateState):
 
 
 def confirm_joining_date(state: CandidateState):
+    
+    if "hr_action" in state and state["hr_action"]:
+        sent_message = mail_sender.send_mail(
+            to=state["email"], body=state["hr_message"])
+        return {"state": States.OFFER_RELEASED, "messages": [sent_message], "hr_message": "", "hr_action": False, "hr_nextnode": ""}
+    
     sent_message = mail_sender.send_mail(
         to=state["email"], type="confirm_joining_date")
     return {"state": States.CONFIRM_JOINING_DATE, "messages": [sent_message]}
@@ -114,8 +128,8 @@ def wait_for_joining_date_confirmation(state: CandidateState):
 def validate_joining_date_confirmation(state: CandidateState):
     response = hr_services.verify_joining_date_confirmation_mail(state)
 
-    if response.query:
-        prepare_answer_for_candidate_query(state, response.query)
+    # if response.query:
+    # prepare_answer_for_candidate_query(state, response.query)
 
     if response.match and response.joining and response.confirmed:
         # state.update({"state": States.JOINING_DATE_CONFIRMED})
@@ -150,8 +164,8 @@ def wait_for_reconfirmation_of_joing_date(state: CandidateState):
 def verify_reconfirmation_of_joing_date(state: CandidateState):
     response = hr_services.verify_reconfirmation_of_joining_date_mail(state)
 
-    if response.query:
-        prepare_answer_for_candidate_query(state, response.query)
+    # if response.query:
+    # prepare_answer_for_candidate_query(state, response.query)
 
     if response.match and response.joining and response.confirmed:
         state.update({"state": States.JOINING_DATE_RECONFIRMED})
@@ -193,12 +207,10 @@ def end_onboarding(state: CandidateState):
 
 def hr_intervention(state: CandidateState):
     response = interrupt("Waiting for HR input")
-    return {"state": States.HR_INTERVENTION}
-
-
-def hr_action(state: CandidateState):
-    response = interrupt("Waiting for HR input")
-    return "end_onboarding"
+    return Command(
+        update={"hr_message": response["hr_message"], "hr_action": True},
+        goto=response["hr_nextnode"]
+    )
 
 
 def prepare_answer_for_candidate_query(state: CandidateState, query: str) -> str:

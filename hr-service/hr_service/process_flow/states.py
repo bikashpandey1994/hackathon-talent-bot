@@ -15,6 +15,8 @@ class CandidateState(TypedDict, total=False):
     candidate_checkpoint_id: Optional[str]
     joining_details: Optional[dict]
     docs: Optional[list[str]]
+    hr_action: bool
+    hr_message: Optional[str]
     
 
 

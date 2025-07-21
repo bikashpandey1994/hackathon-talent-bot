@@ -8,24 +8,27 @@ class InitRequest(TypedDict, total=False):
     email: str
     mobile_no: str
     status: Optional[str]
-    state: Optional[States]  # <-- Use States, not "States"
+    state: Optional[States]
     joining_details: Optional[dict]
     messages: Optional[list[str]]
     candidate_checkpoint_id: Optional[str]
 
 class ResumeRequest(TypedDict, total=False):
     thread_id: Optional[str]
-    state: Optional[States]  # <-- Use States, not "States"
+    state: Optional[States]
     messages: Optional[list[str]]
     docs: Optional[list[str]]
 
 class ActionRequest(TypedDict, total=False):
     thread_id: Optional[str]
-    name: str
-    email: str
-    mobile_no: str
+    name: Optional[str]
+    email: Optional[str]
+    mobile_no: Optional[str]
     status: Optional[str]
-    state: Optional[States]  # <-- Use States, not "States"
+    state: Optional[States]
     messages: Optional[list[str]]
     candidate_checkpoint_id: Optional[str]
     joining_details: Optional[dict]
+    hr_action: bool
+    hr_message: Optional[str]
+    hr_nextnode: str
