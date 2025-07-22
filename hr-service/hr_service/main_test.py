@@ -2,12 +2,18 @@ from .main import app
 
 @app.post("/classify_doc")
 async def classify_document(doc_id:str):
+    """
+    Classify a document by its ID using the LLM document classifier.
+    """
     result = llm_document_classifier.verify_document(doc_id)
     return {"result": result}
 
 
 @app.post("/classify_document")
 async def classify_document_endpoint(file: UploadFile = File(...)):
+    """
+    Classify an uploaded document image using the document classifier.
+    """
     # Read image file
     contents = await file.read()
     image = PilImage.open(io.BytesIO(contents)).convert("RGB")

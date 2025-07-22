@@ -91,9 +91,9 @@ def create_onboarding_graph() -> StateGraph:
         verify_reconfirmation_of_joing_date,
         {"ready_to_join": "ready_to_join", "hr_intervention": "hr_intervention"}
     )
-    builder.add_edge("ready_to_join", "candidate_joined")
+    
+    builder.add_edge("ready_to_join", "hr_intervention")
     builder.add_edge("candidate_joined", "end_onboarding")
-
     builder.add_edge("end_onboarding", END)
 
     graph = builder.compile(

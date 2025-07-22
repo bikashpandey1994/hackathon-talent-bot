@@ -57,8 +57,16 @@ def perform_action(request) -> str:
     }
     
     candidate_state = {
+        "name": request.get("name"),
+        "email": request.get("email"),
+        "mobile_no": request.get("mobile_no"),
+        "status": request.get("status"),
+        "state": request.get("state"),
+        "message": request.get("message"),
+        "joining_details": request.get("joining_details", {}),
         "hr_message": request.get("hr_message"),
-        "hr_nextnode": request.get("hr_nextnode")
+        "hr_nextnode": request.get("hr_nextnode"),
+        "hr_justification": request.get("hr_justification")
     }
         
     graph = onboarding_graph.get_onboarding_graph()

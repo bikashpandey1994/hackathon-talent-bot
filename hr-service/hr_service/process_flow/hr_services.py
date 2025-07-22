@@ -4,6 +4,7 @@ from typing import Optional
 from langchain.chat_models import init_chat_model
 from langchain_core.prompts import ChatPromptTemplate
 from pydantic import BaseModel, Field
+from . import onboarding_graph
 
 from .. import llm_document_classifier
 
@@ -12,6 +13,7 @@ if not os.environ.get("GOOGLE_API_KEY"):
     os.environ["GOOGLE_API_KEY"] = "AIzaSyCiAGnly6Bg8PrfHwF5RCJaFEjLZHDf9Uc"
 
 llm = init_chat_model("gemini-2.0-flash", model_provider="google_genai")
+
 
 class DocumentResponse(BaseModel):
     match: bool = Field(
@@ -74,8 +76,8 @@ class JoiningDateResponse(BaseModel):
 def verify_document_request_mail(candidateState) -> DocumentResponse:
 
     response = verify_context(candidateState)
-    #if response.match:
-    response = verify_documents(candidateState, response)
+    if response.match:
+        response = verify_documents(candidateState, response)
     return response
 
 
@@ -100,25 +102,27 @@ def verify_context(candidateState) -> DocumentResponse:
 
 
 def verify_documents(candidateState, response) -> DocumentResponse:
-    documents_required = ["Aadhar Card","Pan Card", "Passport", "Payslip", "Compensation Letter"]
+    documents_required = ["Aadhar Card", "Pan Card",
+                          "Passport", "Payslip", "Compensation Letter"]
     for doc in candidateState["docs"]:
         document = llm_document_classifier.verify_document(doc)
         print(f"Removing Document : {document.category.value}")
         documents_required.remove(document.category.value)
-    
+
     if not documents_required:
         response.verified = True
     else:
         response.verified = False
     return response
 
+
 def generate_offer_details(candidateState) -> dict:
-    
+
     offer_details = candidateState.get("joining_details", {})
     # Additional offer details can be added here
-    offer_details["probation_period"]  = "180 days"
-    offer_details["notice_period"]  = "60 days"
-    
+    offer_details["probation_period"] = "180 days"
+    offer_details["notice_period"] = "60 days"
+
     return offer_details
 
 
@@ -200,3 +204,40 @@ def verify_reconfirmation_of_joining_date_mail(candidateState) -> JoiningDateRes
         input="Sent mail: " + second_last_message + "\nReceived mail: " + last_message)
 
     return response
+
+
+def summarize_candidate_state(state) -> str:
+    """
+    Summarizes the candidate's state for HR intervention.
+    """
+
+    graph = onboarding_graph.get_onboarding_graph()
+    config = {"configurable": {"thread_id": state["thread_id"]}}
+    states = list(graph.get_state_history(config))
+    summary = ""
+    if states:
+        candidateState = states[0].values
+        summary = f"Candidate Name: {candidateState['name']}\n"
+        summary += f"Email: {candidateState['email']}\n"
+        summary += f"Mobile No: {candidateState['mobile_no']}\n"
+        summary += f"Current State: {candidateState['state'].value if candidateState['state'] else 'Unknown'}\n"
+        summary += "Joining Details:\n"
+        for key, value in candidateState["joining_details"].items():
+            summary += f"  {key}: {value}\n"
+
+    for candidateState in states:
+        summary += f"Messages: {', '.join(candidateState.values['messages'])}\n"
+
+    response = llm.invoke(
+        f"Create a concise summary of the candidate based on following context: {summary}"
+    )
+
+    is_summary_request = state.get("summary", False)
+    if is_summary_request:
+        return response.content
+    elif state.get("query"):
+        response = llm.invoke(
+        f"Answer this question: {state.get('query', '')} based on the following context: {summary}")
+        return response.content
+    else:
+        return "No summary or query provided. Please provide a valid request." 

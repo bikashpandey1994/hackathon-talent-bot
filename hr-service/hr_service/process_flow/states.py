@@ -17,6 +17,7 @@ class CandidateState(TypedDict, total=False):
     docs: Optional[list[str]]
     hr_action: bool
     hr_message: Optional[str]
+    llm_message: Optional[str]
     
 
 

@@ -18,6 +18,11 @@ class ResumeRequest(TypedDict, total=False):
     state: Optional[States]
     messages: Optional[list[str]]
     docs: Optional[list[str]]
+    
+class QueryRequest(TypedDict, total=False):
+    thread_id: Optional[str]
+    summary: Optional[bool]
+    query: Optional[str]
 
 class ActionRequest(TypedDict, total=False):
     thread_id: Optional[str]
@@ -32,3 +37,4 @@ class ActionRequest(TypedDict, total=False):
     hr_action: bool
     hr_message: Optional[str]
     hr_nextnode: str
+    hr_justification: Optional[str]
