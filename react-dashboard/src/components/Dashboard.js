@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Header from './Header';
 import SideNav from './SideNav';
 import DashboardMainContent from './DashboardMainContent';
 import { dateOptions, mockApi } from '../data/dashboardData';
+import dataService from '../client/dataService';
+import { getConfig } from '../client/config';
 import '../css/Dashboard.css';
 
 const Dashboard = () => {
@@ -16,18 +18,38 @@ const Dashboard = () => {
   const [showCustomList, setShowCustomList] = useState(false);
   const [customListData, setCustomListData] = useState([]);
   const [customExpandedId, setCustomExpandedId] = useState(null);
+  const [apiCandidates, setApiCandidates] = useState([]);
+
+  // Initialize data service
+  useEffect(() => {
+    const config = getConfig();
+    dataService.configure(config.baseURL);
+  }, []);
 
   useEffect(() => {
-    // Fetch data when selectedDate changes
+    // Fetch data when selectedDate changes - using mock data for now
+    // In the future, this could be replaced with API calls that filter by date
     mockApi(selectedDate).then(data => setList(data));
   }, [selectedDate]);
+
+  // Handle candidates loaded from API in List component - use useCallback to stabilize reference
+  const handleCandidatesLoaded = useCallback((candidates) => {
+    setApiCandidates(candidates);
+    // You could also update the list state here if needed
+    // setList(candidates);
+  }, []);
 
   // For demo, use the same list as dashboard for CustomList
   useEffect(() => {
     if (showUploader) {
-      mockApi(selectedDate).then(data => setCustomListData(data));
+      // Use API candidates if available, otherwise fall back to mock data
+      if (apiCandidates.length > 0) {
+        setCustomListData(apiCandidates);
+      } else {
+        mockApi(selectedDate).then(data => setCustomListData(data));
+      }
     }
-  }, [showUploader, selectedDate]);
+  }, [showUploader, selectedDate, apiCandidates]);
 
   // Reset showCustomList when leaving uploader view
   useEffect(() => {
@@ -38,9 +60,10 @@ const Dashboard = () => {
     setSelectedDate(e.target.value);
   };
 
-  // Overview calculations
-  const totalJoining = list.length;
-  const notReadyToJoin = list.filter(item => !item.readyToJoin).length;
+  // Overview calculations - use API candidates if available
+  const dataForCalculations = apiCandidates.length > 0 ? apiCandidates : list;
+  const totalJoining = dataForCalculations.length;
+  const notReadyToJoin = dataForCalculations.filter(item => !item.readyToJoin).length;
 
   // Filter list by search
   const filteredList = list.filter(
@@ -92,6 +115,7 @@ const Dashboard = () => {
         chartType={chartType}
         setSearch={setSearch}
         search={search}
+        onCandidatesLoaded={handleCandidatesLoaded}
       />
     </div>
   );

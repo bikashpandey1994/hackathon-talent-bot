@@ -101,7 +101,7 @@ def history(candidate_state) -> List[GraphState]:
 
     graph = onboarding_graph.get_onboarding_graph()
     config = {"configurable": {"thread_id": candidate_state["thread_id"]}}
-    states = list(graph.get_state_history(config))
+    graph_states = list(graph.get_state_history(config))
 
     if graph_states:
         graph_states = [GraphState(
@@ -111,7 +111,7 @@ def history(candidate_state) -> List[GraphState]:
             checkpoint_id=state.config['configurable']["checkpoint_id"],
             created_at=state.created_at,
             # interrupts=state.interrupts
-        ) for state in states]
+        ) for state in graph_states]
         return graph_states
     else:
         graph_states = []

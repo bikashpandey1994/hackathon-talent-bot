@@ -23,7 +23,8 @@ const DashboardMainContent = ({
   notReadyToJoin,
   chartType,
   setSearch,
-  search
+  search,
+  onCandidatesLoaded
 }) => (
   <div className="dashboard-main-content">
     <div className="dashboard-main-flex">
@@ -38,6 +39,7 @@ const DashboardMainContent = ({
                 setExpandedId={setCustomExpandedId}
                 title="Uploaded Candidates"
                 showStatusFilter={true}
+                useApi={false}
               />
               <div className="customlist-footer">
                 <button className="customlist-footer-btn">
@@ -70,6 +72,7 @@ const DashboardMainContent = ({
             list={filteredList}
             expandedId={expandedId}
             setExpandedId={setExpandedId}
+            onCandidatesLoaded={onCandidatesLoaded}
           />
         </>
       )}

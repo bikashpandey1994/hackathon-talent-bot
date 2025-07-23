@@ -39,6 +39,28 @@
   min-height: 0;
 }
 
+.list-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  color: #219150;
+  font-size: 1.1rem;
+}
+
+.list-error {
+  padding: 1rem;
+  background-color: #ffebee;
+  border: 1px solid #ffcdd2;
+  border-radius: 4px;
+  color: #d32f2f;
+  margin-bottom: 1rem;
+}
+
+.list-error p {
+  margin: 0.5rem 0;
+}
+
 @media (max-width: 600px) {
   .list-root {
     margin: 0.5rem 0.5rem 0.5rem 0.5rem;

@@ -1,25 +1,34 @@
+import io
+import os
+from typing import List
 from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.responses import StreamingResponse
+from fastapi.middleware.cors import CORSMiddleware
 from hr_service.process_flow.states import CandidateState
 from PIL import Image as PilImage
-import io
-from typing import List
-
 from hr_service.process_flow.onboarding_graph import create_onboarding_graph
 from hr_service.process_flow.langgraph_workflow import history, init, resume, perform_action, get_state
 from hr_service.process_flow import hr_services
-# from . import document_classifier
 from hr_service.classifier import llm_document_classifier
 from .models import InitRequest, ResumeRequest, ActionRequest, QueryRequest
-import os
+from config import GOOGLE_API_KEY
 
 if not os.environ.get("OCR_AGENT"):
     os.environ["OCR_AGENT"] = "unstructured.partition.utils.ocr_models.tesseract_ocr.OCRAgentTesseract"
     
 if not os.environ.get("GOOGLE_API_KEY"):
-    os.environ["GOOGLE_API_KEY"] = "AIzaSyDexZthIVwq3kH7zJ_cueWekuIUqhl012A"
+    os.environ["GOOGLE_API_KEY"] = GOOGLE_API_KEY
 
 app = FastAPI()
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allows all origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods
+    allow_headers=["*"],  # Allows all headers
+)
 
 
 @app.post("/init")

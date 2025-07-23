@@ -34,7 +34,7 @@ class ActionRequest(TypedDict, total=False):
     messages: Optional[list[str]]
     candidate_checkpoint_id: Optional[str]
     joining_details: Optional[dict]
-    hr_action: bool
+    hr_action: Optional[bool]
     hr_message: Optional[str]
-    hr_nextnode: str
+    hr_nextnode: Optional[str]
     hr_justification: Optional[str]

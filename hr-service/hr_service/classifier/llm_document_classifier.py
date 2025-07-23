@@ -11,11 +11,11 @@ from langchain_core.messages import HumanMessage
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_community.document_loaders.image import UnstructuredImageLoader
 from langchain_community.document_loaders import PyPDFLoader
-
+from config import GOOGLE_API_KEY, FILE_PATH
 
 
 if not os.environ.get("GOOGLE_API_KEY"):
-    os.environ["GOOGLE_API_KEY"] = "AIzaSyDexZthIVwq3kH7zJ_cueWekuIUqhl012A"
+    os.environ["GOOGLE_API_KEY"] = GOOGLE_API_KEY
     
 llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash")
 
@@ -56,13 +56,13 @@ class PDFDocument(BaseModel):
 
 def fetch_document(doc_id: str) -> str:
     # May need modification in a cloud environment
-    path = rf"C:\Users\bikas\OneDrive\Documents\All Documents\{doc_id}"
+    path = FILE_PATH +"/" + doc_id
     with open(path, "rb") as img_file:
         encoded = base64.b64encode(img_file.read()).decode("utf-8")
     return encoded
 
 def fetch_pdf(doc_id:str) -> str:
-    path = rf"C:\Users\bikas\OneDrive\Documents\All Documents\{doc_id}"
+    path = FILE_PATH +"/" + doc_id
     loader = PyPDFLoader(path)
     docs = loader.load()
     return docs[0].page_content

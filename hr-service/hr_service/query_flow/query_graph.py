@@ -10,13 +10,12 @@ from pydantic import BaseModel, Field
 from langchain_chroma import Chroma
 from langchain import hub
 from langchain_community.document_loaders import PyPDFLoader
+from config import GOOGLE_API_KEY, FILE_PATH, POLICY_FILE_PATH
 
 if not os.environ.get("GOOGLE_API_KEY"):
-    os.environ["GOOGLE_API_KEY"] = "AIzaSyDexZthIVwq3kH7zJ_cueWekuIUqhl012A"
-
-
-file_path = r"C:\Users\bikas\OneDrive\Documents\Leave-and-Holiday-Policy.pdf"
-loader = PyPDFLoader(file_path)
+    os.environ["GOOGLE_API_KEY"] = GOOGLE_API_KEY
+    
+loader = PyPDFLoader(POLICY_FILE_PATH)
 documents = list(loader.lazy_load())
 
 

@@ -1,0 +1,12 @@
+com\lbg\onboardPro\workflowmanagermain.class
+com\lbg\onboardPro\Manager.class
+com\lbg\onboardPro\db\NotificationRepository.class
+com\lbg\hr\entity\Notification.class
+com\lbg\onboardPro\rest\HttpClientAsyncPost.class
+com\lbg\onboardPro\db\CandidateRepository.class
+com\lbg\onboardPro\HRServiceInteractor.class
+com\lbg\onboardPro\WorkflowManagerController.class
+com\lbg\hr\entity\Candidate.class
+com\lbg\hr\enums\CandidateStatus.class
+com\lbg\onboardPro\Utils.class
+com\lbg\onboardPro\scheduler\CandidatePollingScheduler.class
