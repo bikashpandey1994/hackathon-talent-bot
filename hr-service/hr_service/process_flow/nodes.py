@@ -8,11 +8,11 @@ from langgraph.graph import StateGraph, START, END
 from langchain.chat_models import init_chat_model
 from hr_service.process_flow import hr_services
 from hr_service.process_flow.states import CandidateState, States, QueryState
-from ..communication import mail_sender
+from hr_service.communication.communication import mail_sender
 from hr_service.query_flow import query_graph
 
 if not os.environ.get("GOOGLE_API_KEY"):
-    os.environ["GOOGLE_API_KEY"] = "AIzaSyCiAGnly6Bg8PrfHwF5RCJaFEjLZHDf9Uc"
+    os.environ["GOOGLE_API_KEY"] = "AIzaSyDexZthIVwq3kH7zJ_cueWekuIUqhl012A"
 
 llm = init_chat_model("gemini-2.0-flash", model_provider="google_genai")
 query_graph = query_graph.get_query_graph()
@@ -226,7 +226,7 @@ def hr_intervention(state: CandidateState):
         updated_state["hr_justification"] = response["hr_justification"]
     if "hr_action" in response and response["hr_action"]:
         updated_state["hr_action"] = True
-
+    print(f"Updated state for HR intervention: {response}")
     return Command(
         update=updated_state,
         goto=response["hr_nextnode"]

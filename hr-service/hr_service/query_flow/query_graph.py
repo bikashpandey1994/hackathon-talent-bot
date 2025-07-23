@@ -12,7 +12,7 @@ from langchain import hub
 from langchain_community.document_loaders import PyPDFLoader
 
 if not os.environ.get("GOOGLE_API_KEY"):
-    os.environ["GOOGLE_API_KEY"] = "AIzaSyCiAGnly6Bg8PrfHwF5RCJaFEjLZHDf9Uc"
+    os.environ["GOOGLE_API_KEY"] = "AIzaSyDexZthIVwq3kH7zJ_cueWekuIUqhl012A"
 
 
 file_path = r"C:\Users\bikas\OneDrive\Documents\Leave-and-Holiday-Policy.pdf"

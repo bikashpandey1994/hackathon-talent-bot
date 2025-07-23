@@ -1,4 +1,5 @@
 from .main import app
+from hr_service.classifier import llm_document_classifier, document_classifier
 
 @app.post("/classify_doc")
 async def classify_document(doc_id:str):

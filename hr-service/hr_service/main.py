@@ -9,7 +9,7 @@ from hr_service.process_flow.onboarding_graph import create_onboarding_graph
 from hr_service.process_flow.langgraph_workflow import history, init, resume, perform_action, get_state
 from hr_service.process_flow import hr_services
 # from . import document_classifier
-from . import llm_document_classifier
+from hr_service.classifier import llm_document_classifier
 from .models import InitRequest, ResumeRequest, ActionRequest, QueryRequest
 import os
 
@@ -17,7 +17,7 @@ if not os.environ.get("OCR_AGENT"):
     os.environ["OCR_AGENT"] = "unstructured.partition.utils.ocr_models.tesseract_ocr.OCRAgentTesseract"
     
 if not os.environ.get("GOOGLE_API_KEY"):
-    os.environ["GOOGLE_API_KEY"] = "AIzaSyCiAGnly6Bg8PrfHwF5RCJaFEjLZHDf9Uc"
+    os.environ["GOOGLE_API_KEY"] = "AIzaSyDexZthIVwq3kH7zJ_cueWekuIUqhl012A"
 
 app = FastAPI()
 

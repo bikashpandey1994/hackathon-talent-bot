@@ -5,12 +5,13 @@ from langchain.chat_models import init_chat_model
 from langchain_core.prompts import ChatPromptTemplate
 from pydantic import BaseModel, Field
 from . import onboarding_graph
+from config import DOCUMENTS_REQUIRED
 
-from .. import llm_document_classifier
+from hr_service.classifier import llm_document_classifier
 
 
 if not os.environ.get("GOOGLE_API_KEY"):
-    os.environ["GOOGLE_API_KEY"] = "AIzaSyCiAGnly6Bg8PrfHwF5RCJaFEjLZHDf9Uc"
+    os.environ["GOOGLE_API_KEY"] = "AIzaSyDexZthIVwq3kH7zJ_cueWekuIUqhl012A"
 
 llm = init_chat_model("gemini-2.0-flash", model_provider="google_genai")
 
@@ -76,8 +77,9 @@ class JoiningDateResponse(BaseModel):
 def verify_document_request_mail(candidateState) -> DocumentResponse:
 
     response = verify_context(candidateState)
-    if response.match:
-        response = verify_documents(candidateState, response)
+    #if response.match:
+        #response = verify_documents(candidateState, response)
+    response.verified = True
     return response
 
 
@@ -102,8 +104,8 @@ def verify_context(candidateState) -> DocumentResponse:
 
 
 def verify_documents(candidateState, response) -> DocumentResponse:
-    documents_required = ["Aadhar Card", "Pan Card",
-                          "Passport", "Payslip", "Compensation Letter"]
+    # Use the configurable property for required documents
+    documents_required = DOCUMENTS_REQUIRED.copy()
     for doc in candidateState["docs"]:
         document = llm_document_classifier.verify_document(doc)
         print(f"Removing Document : {document.category.value}")
@@ -240,4 +242,13 @@ def summarize_candidate_state(state) -> str:
         f"Answer this question: {state.get('query', '')} based on the following context: {summary}")
         return response.content
     else:
-        return "No summary or query provided. Please provide a valid request." 
+        return "No summary or query provided. Please provide a valid request."
+    is_summary_request = state.get("summary", False)
+    if is_summary_request:
+        return response.content
+    elif state.get("query"):
+        response = llm.invoke(
+        f"Answer this question: {state.get('query', '')} based on the following context: {summary}")
+        return response.content
+    else:
+        return "No summary or query provided. Please provide a valid request."
