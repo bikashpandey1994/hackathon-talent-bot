@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import SearchBar from './SearchBar';
 import ActionPopup from './ActionPopup';
 import dataService from '../client/dataService';
 import { getConfig } from '../client/config';
 import '../css/Header.css';
 
-const Header = ({ navOpen, onNavOpen, onNavClose, search, setSearch }) => {
+const Header = ({ navOpen, onNavOpen, onNavClose }) => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -104,9 +103,6 @@ const Header = ({ navOpen, onNavOpen, onNavClose, search, setSearch }) => {
         &#9776;
       </button>
       <h1 className="header-title">Dashboard</h1>
-      <div className="header-searchbar-container">
-        <SearchBar search={search} setSearch={setSearch} />
-      </div>
       <div className="header-notification-icon">
         <button
           className="header-notification-btn"

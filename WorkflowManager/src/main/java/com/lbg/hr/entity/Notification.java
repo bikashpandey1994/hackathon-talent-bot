@@ -8,7 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name="notification", schema="onboarding")
+@Table(name="notification")
 @Getter
 @Setter
 public class Notification {

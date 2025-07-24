@@ -21,7 +21,7 @@ public class HRServiceInteractor {
 		    .append("\"email\": \"").append(candidate.getEmail()).append("\",")
 		    .append("\"name\": \"").append(candidate.getName()).append("\",")
 		    .append("\"mobile_no\": \"").append(candidate.getPhone()).append("\",")
-		    .append("\"thread_id\": \"").append(UUID.randomUUID()).append("\",")
+		    .append("\"thread_id\": \"").append(candidate.getEmail()).append("\",")
 		    .append("\"joining_details\": {")
 		        .append("\"position\": \"").append(candidate.getDesignation()).append("\",")
 		        .append("\"compensation\": \"").append("100000").append("\",")
@@ -33,12 +33,12 @@ public class HRServiceInteractor {
 		String jsonBody = jsonBuilder.toString();
 
 		
-		return HttpClientAsyncPost.sendPostRequest(hrServiceUrl, jsonBuilder.toString()); 
+		return HttpClientAsyncPost.sendPostRequest(hrServiceUrl+"/init", jsonBuilder.toString());
 		
 	}
 	
 	public String interactWithResumeAPI(String message) {
-		return HttpClientAsyncPost.sendPostRequest(hrServiceUrl, message); 
+		return HttpClientAsyncPost.sendPostRequest(hrServiceUrl+"/resume", message);
 	}
 
 }

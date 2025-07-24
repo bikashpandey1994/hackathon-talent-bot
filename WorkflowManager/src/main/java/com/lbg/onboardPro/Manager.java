@@ -2,6 +2,7 @@ package com.lbg.onboardPro;
 
 import java.io.IOException;
 
+import com.lbg.hr.entity.Notification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -45,16 +46,17 @@ public class Manager {
 	
 	private void SaveToDB(String body) throws IOException {
 		String status = Utils.getDetailsFromBody(body, "state");
+		String email = Utils.getDetailsFromBody(body, "email");
 		if(Utils.isValidStatus(status)) {
-		 candidateRepository.updateStatusByEmail("email", status);
+		 candidateRepository.updateStatusByEmail(email, status);
 		}
-		
-		String state = Utils.getDetailsFromBody(body, "status");
-		if(state.equals(CandidateStatus.HR_INTERVENTION.toString())) {
-			notificationRepository.updateMessageByEmail(Utils.getDetailsFromBody(body, "email"), Utils.getDetailsFromBody(body, "message"));
+
+		if(body.contains("Waiting for HR input")){
+			notificationRepository.updateMessageByEmail(email, Utils.getDetailsFromBody(body, "message"));
+			Notification notification = new Notification();
+			notification.setEmail(email);
+			notification.setMessage("Bikash Rejected Offer");
+			notificationRepository.saveNotification(notification);
 		}
 	}
-	
-	
-
 }

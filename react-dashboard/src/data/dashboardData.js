@@ -1,10 +1,10 @@
 // Data and mock API for Dashboard
 
 export const dateOptions = [
-  '2024-06-01',
-  '2024-06-02',
-  '2024-06-03',
-  '2024-06-04'
+  '2025-08-01',
+  '2025-08-08',
+  '2025-08-16',
+  '2025-08-24'
 ];
 
 export const mockApi = (date) => {

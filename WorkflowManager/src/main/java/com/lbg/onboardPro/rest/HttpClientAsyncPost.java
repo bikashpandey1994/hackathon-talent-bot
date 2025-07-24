@@ -1,32 +1,25 @@
 package com.lbg.onboardPro.rest;
 
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.util.concurrent.CompletableFuture;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.web.client.RestTemplate;
 
 public class HttpClientAsyncPost {
-	
-	/**
-	 * Method to send an asynchronous POST request.
-	 * 
-	 * @param url     The URL to which the POST request is sent.
-	 * @param payload The data to be sent in the POST request.
-	 * @return 
-	 */
-	public static String sendPostRequest(String url, String jsonBody) {
-		
-		HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(url))
-                .header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
-                .build();
+    /**
+     * Method to send a POST request using RestTemplate.
+     *
+     * @param url     The URL to which the POST request is sent.
+     * @param jsonBody The data to be sent in the POST request.
+     * @return Response body as String
+     */
+    public static String sendPostRequest(String url, String jsonBody) {
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
 
-        CompletableFuture<HttpResponse<String>> responseFuture = HttpClient.newHttpClient().sendAsync(request, HttpResponse.BodyHandlers.ofString());
+        HttpEntity<String> entity = new HttpEntity<>(jsonBody, headers);
 
-        
-        return responseFuture.thenApply(HttpResponse::body).join();
-	}
-
+        return restTemplate.postForObject(url, entity, String.class);
+    }
 }

@@ -14,10 +14,7 @@ CREATE TABLE candidate (
     aadhaar VARCHAR(255),
     date_of_birth DATE NOT NULL,
     expected_joining_date DATE,
-    hr_coordinator VARCHAR(255),
-    CONSTRAINT unique_aadhaar_number UNIQUE (aadhaar),
-    CONSTRAINT unique_personal_contact_number UNIQUE (phone),
-    CONSTRAINT unique_personal_email UNIQUE (email)
+    hr_coordinator VARCHAR(255)
 );
 
 CREATE TABLE notification (

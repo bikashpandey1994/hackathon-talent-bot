@@ -11,7 +11,11 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
 	
 	@Modifying
     @Transactional
-    @Query("UPDATE notification_message u SET u.message = :message WHERE u.email = :email")
+    @Query("UPDATE Notification t SET t.message = :message WHERE t.email = :email")
     int updateMessageByEmail(String email, String message);
+
+    default Notification saveNotification(Notification notification) {
+        return save(notification);
+    }
 
 }

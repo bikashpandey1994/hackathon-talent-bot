@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../css/ListCard.css';
+import hrService from '../client/hrService';
 
 const mockConversations = [
   { date: '2024-06-01', message: 'Initial call with candidate.' },
@@ -28,6 +29,51 @@ const ListCard = ({ item, expanded, onClick, hideActions }) => {
   const [showPopup, setShowPopup] = useState(false);
   const [showActionPopup, setShowActionPopup] = useState(false);
   const [candidateStatus, setCandidateStatus] = useState(item.status);
+  const [candidateDetails, setCandidateDetails] = useState(null);
+  const [detailsLoading, setDetailsLoading] = useState(false);
+  const [detailsError, setDetailsError] = useState(null);
+  const [conversations, setConversations] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const messagesPerPage = 5;
+
+  const fetchCandidateDetails = async () => {
+    setDetailsLoading(true);
+    setDetailsError(null);
+    try {
+      const threadId = "bikashpandey18@gmail.com";//item.email;
+      const response = await hrService.getCandidateState(threadId);
+      
+      // Set candidate details from response.result.values
+      if (response && response.result && response.result.values) {
+        setCandidateDetails(response.result.values);
+      } else {
+        setCandidateDetails(response.values || response);
+      }
+      
+      // Extract conversations from response.result.values.messages
+      if (response && response.result && response.result.values && response.result.values.messages) {
+        setConversations(response.result.values.messages);
+      } else {
+        setConversations([]);
+      }
+    } catch (err) {
+      console.error('Failed to fetch candidate details:', err);
+      setDetailsError(err.message || 'Failed to fetch details');
+      setConversations([]);
+    } finally {
+      setDetailsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (showPopup && !candidateDetails) {
+      fetchCandidateDetails();
+    }
+    // Reset pagination when popup opens
+    if (showPopup) {
+      setCurrentPage(1);
+    }
+  }, [showPopup]);
 
   const handleStatusChange = (e) => {
     setCandidateStatus(e.target.value);
@@ -128,23 +174,85 @@ const ListCard = ({ item, expanded, onClick, hideActions }) => {
           >
             <button className="listcard-popup-close" onClick={() => setShowPopup(false)}>&times;</button>
             <h3 style={{ color: '#219150', marginBottom: '1em' }}>Candidate Details</h3>
+            
+            {detailsLoading ? (
+              <div style={{ textAlign: 'center', padding: '2em' }}>Loading details...</div>
+            ) : detailsError ? (
+              <div style={{ color: '#d32f2f', marginBottom: '1em' }}>
+                Error: {detailsError}
+              </div>
+            ) : null}
+
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5em 2em', marginBottom: '1em' }}>
-              <div><b>Name:</b> {item.name}</div>
-              <div><b>Grade:</b> {item.grade}</div>
-              <div><b>Description:</b> {item.description}</div>
-              <div><b>Joining Date:</b> {item.joiningDate}</div>
-              <div><b>Status:</b> {item.status}</div>
-              <div><b>State:</b> {item.state}</div>
-              <div><b>Ready to Join:</b> {item.readyToJoin ? 'Yes' : 'No'}</div>
-              <div><b>Candidate ID:</b> {item.id}</div>
+              <div><b>Name:</b> {candidateDetails?.name || item.name || 'N/A'}</div>
+              <div><b>Grade:</b> {candidateDetails?.grade || item.grade || 'N/A'}</div>
+              <div><b>Description:</b> {candidateDetails?.description || item.description || 'N/A'}</div>
+              <div><b>Joining Date:</b> {candidateDetails?.joiningDate || candidateDetails?.joining_date || item.joiningDate || 'N/A'}</div>
+              <div><b>Status:</b> {candidateDetails?.status || item.status || 'N/A'}</div>
+              <div><b>State:</b> {candidateDetails?.state || item.state || 'N/A'}</div>
+              <div><b>Ready to Join:</b> {candidateDetails?.readyToJoin !== undefined ? (candidateDetails.readyToJoin ? 'Yes' : 'No') : (item.readyToJoin ? 'Yes' : 'No')}</div>
+              <div><b>Candidate ID:</b> {candidateDetails?.id || candidateDetails?.candidate_id || item.id || 'N/A'}</div>
             </div>
             <h4 style={{ marginTop: '1em', color: '#219150' }}>Conversations</h4>
             <div className="listcard-popup-conversations">
-              {mockConversations.map((conv, idx) => (
-                <div key={idx} className="listcard-popup-conv">
-                  <div><b>{conv.date}:</b> {conv.message}</div>
-                </div>
-              ))}
+              {conversations.length > 0 ? (
+                <>
+                  {/* Paginated conversations */}
+                  {conversations
+                    .slice((currentPage - 1) * messagesPerPage, currentPage * messagesPerPage)
+                    .map((message, idx) => {
+                      const actualIndex = (currentPage - 1) * messagesPerPage + idx;
+                      return (
+                        <div key={actualIndex} className="listcard-popup-conv">
+                          <div><b>{actualIndex % 2 === 0 ? 'HR' : 'Candidate'}:</b> {message.content || message.text || message.message || message || 'No content'}</div>
+                          {message.timestamp && <div style={{ fontSize: '0.8em', color: '#666' }}>{message.timestamp}</div>}
+                        </div>
+                      );
+                    })}
+                  
+                  {/* Pagination controls */}
+                  {conversations.length > messagesPerPage && (
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1em', padding: '0.5em 0' }}>
+                      <button
+                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                        disabled={currentPage === 1}
+                        style={{
+                          padding: '0.3em 0.8em',
+                          borderRadius: '4px',
+                          border: '1px solid #b2dfdb',
+                          background: currentPage === 1 ? '#f5f5f5' : '#fff',
+                          color: currentPage === 1 ? '#999' : '#219150',
+                          cursor: currentPage === 1 ? 'not-allowed' : 'pointer'
+                        }}
+                      >
+                        Previous
+                      </button>
+                      
+                      <span style={{ fontSize: '0.9em', color: '#666' }}>
+                        Page {currentPage} of {Math.ceil(conversations.length / messagesPerPage)} 
+                        ({conversations.length} messages)
+                      </span>
+                      
+                      <button
+                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, Math.ceil(conversations.length / messagesPerPage)))}
+                        disabled={currentPage === Math.ceil(conversations.length / messagesPerPage)}
+                        style={{
+                          padding: '0.3em 0.8em',
+                          borderRadius: '4px',
+                          border: '1px solid #b2dfdb',
+                          background: currentPage === Math.ceil(conversations.length / messagesPerPage) ? '#f5f5f5' : '#fff',
+                          color: currentPage === Math.ceil(conversations.length / messagesPerPage) ? '#999' : '#219150',
+                          cursor: currentPage === Math.ceil(conversations.length / messagesPerPage) ? 'not-allowed' : 'pointer'
+                        }}
+                      >
+                        Next
+                      </button>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div>No conversations found.</div>
+              )}
             </div>
           </div>
         </div>

@@ -1,4 +1,6 @@
 from typing import Protocol
+import requests
+import json
 
 
 class MailSenderProtocol(Protocol):
@@ -8,21 +10,125 @@ class MailSenderProtocol(Protocol):
 
 class SimpleMailSender:
     def send_mail(self, type: str = "", to: str = "", subject: str = "", body: str = "", reason: str = "", values: dict = {}) -> str:
-        
+
         if "document_request" == type:
-            return "Dear [Candidate's Name],\n\nWe’re pleased to inform you that you’ve been selected for the position of [Job Title] following your recent interview with us at [Company Name]. Congratulations!\n\nTo move forward with the onboarding process, we kindly request you to share the following documents at your earliest convenience:\n\n- Government-issued ID (e.g., Aadhaar, Passport, PAN)\n- Latest educational certificates\n- Previous employment documents (if applicable)\n- Passport-sized photograph\n- Any other documents as discussed during the interview\n\nPlease send scanned copies to [Your Email Address] by [Mention Deadline], so we can initiate the next steps without delay.\n\nShould you have any questions or need assistance, feel free to reach out.\n\nLooking forward to welcoming you aboard!\n\nWarm regards,\nHR Department\nLloyds Technology Center\nHyderabad"
+            return """
+Dear Bikash Ranjan Pandey,
+
+Congratulations! We’re pleased to inform you that you’ve been selected for the Software Engineer position following your interview. We were impressed by your skills and enthusiasm, and we’re excited to have you onboard.
+To proceed, please submit required documents within 48 hrs. You’ll find the list of documents and instructions below.
+1. Aadhar Card
+2. PAN Card
+3. Passport
+4. Latest Payslip
+
+Feel free to reach out if you have any questions. Welcome to the team!
+
+Warm regards,
+HR Team
+Lloyds Technology Center
+            """
         elif "offer_letter" == type:
-            return "Dear [Candidate's Name],\n\nWe are delighted to extend to you the offer for the position of [Job Title] at [Company Name]. Your skills and experience impressed us during the selection process, and we’re excited about the contributions you’ll bring to our team.\n\nAttached to this email, you will find your official offer letter, which includes details about:\n\n- Role and responsibilities\n- Compensation package\n- Start date\n- Reporting manager\n- Additional terms and conditions\n\nPlease review the document thoroughly and let us know your acceptance by replying to this email or signing and returning the offer letter by [Offer Acceptance Deadline].\n\nShould you have any questions or need clarifications, feel free to get in touch. We look forward to having you onboard and beginning a fruitful journey together.\n\nWarm regards,\n[Your Full Name]\n[Your Designation]\n[Company Name]\n[Contact Information]"
+            return """Dear Bikash Ranjan Pandey,
+        
+We’re delighted to offer you the position of Software Engineer at Lloyds Technology Center. Attached is your official offer letter outlining the terms and conditions of your employment.
+Please review the document and confirm your acceptance.
+
+We look forward to having you on the team!
+
+Warm regards,
+HR Team
+Lloyds Technology Center
+Hyderabad"""
         elif "initiate_bgv" == type:
-            return "Dear BGV Team,\n\nWe would like to initiate the background verification process for the below candidate who has been offered the position of [Job Title] at [Company Name]. Please find the details and attached documents required for verification:\n\n- Candidate Name: [Candidate's Name]\n- Position: [Job Title]\n- Joining Date: [Proposed Start Date]\n- Offer Letter: Attached\n- Government-issued ID: Attached\n- Educational Certificates: Attached\n- Employment Records (if applicable): Attached\n\nKindly proceed with the verification and keep us updated with the status. If any additional information is required, feel free to reach out.\n\nThank you for your support in completing the onboarding formalities.\n\nBest regards,\n[Your Full Name]\nHR Team\n[Company Name]\n[Contact Information]"
+            return """Dear BGV Team,
+
+I hope this message finds you well.
+Please initiate the background verification process for Bikash Ranjan Pandey, who has accepted our offer for the position of Software Engineer at Lloyds Technology Center.
+Attached are the candidate’s details and required documents for your reference. Kindly confirm once the process is underway, and let us know if any additional information is needed.
+
+Warm regards,
+HR Team
+Lloyds Technology Center
+Hyderabad"""
         elif "confirm_joining_date" == type:
-            return "Dear [Candidate's Name],\n\nWe’re pleased to inform you that your background verification process has been successfully completed. Thank you for your prompt submission of all required documents and your cooperation throughout the process.\n\nWe are excited to welcome you to [Company Name]! Please find below the details of your joining:\n\n- Position: [Job Title]\n- Joining Date: [Confirmed Start Date]\n- Reporting Time & Location: [Time], [Office Address or Virtual Onboarding Details]\n- Point of Contact: [Onboarding Coordinator's Name & Contact Info]\n\nKindly confirm your availability for the mentioned date and let us know if you require any assistance or clarification prior to onboarding.\n\nLooking forward to having you onboard and beginning a successful journey together.\n\nWarm regards,\n[Your Full Name]\nHR Team\n[Company Name]\n[Contact Information]"
+            return """
+Dear Bikash Ranjan Pandey,
+
+Thank you for your prompt response and for accepting our offer. We’re pleased to confirm your joining date as 1st of Aug 2025 for the position of Software Engineer at Lloyds Technology Center.
+Please ensure all required documents are submitted prior to the joining date, and feel free to reach out if you have any questions or need further assistance.
+
+We look forward to welcoming you onboard!
+
+Warm regards,
+HR Team
+Lloyds Technology Center
+Hyderabad"""
         elif "appointment_letter" == type:
-            return "Dear [Candidate's Name],\n\nWe are pleased to formally offer you the position of [Job Title] at [Company Name], effective from [Joining Date]. This appointment is based on your qualifications, performance during the selection process, and mutual alignment with our organizational goals.\n\nThe key details of your appointment are as follows:\n\n- Position: [Job Title]\n- Reporting Manager: [Manager's Name]\n- Department: [Department Name]\n- Location: [Office Location or Remote Work Details]\n- Start Date: [Joining Date]\n- Compensation: As per the offer letter provided\n- Working Hours: [Standard Working Hours or as per business needs]\n- Probation Period: [Mention Duration, if applicable]\n\nPlease review the attached appointment letter for detailed terms and conditions. By signing and returning the letter, you acknowledge your acceptance of the role and agreement to abide by the company policies and practices.\n\nWe are excited to welcome you to our team and look forward to a successful association.\n\nWarm regards,\n[Your Full Name]\nHR Team\n[Company Name]\n[Contact Information]"
+            return """Dear Bikash Ranjan pandey,
+
+We are pleased to offer you the position of Software Engineer at LLoyds. Your employment will commence on 1st of Aug 2025, and you will report to Koushik.
+Your annual compensation will be as discussed, and further details regarding terms of employment, responsibilities, and benefits are enclosed.
+Please find your appointment letter attched.
+
+Warm regards,
+HR Team
+Lloyds Technology Center
+Hyderabad"""
         elif "reconfirm_joing_date" == type:
             return "Dear [Candidate's Name],\n\nWe hope you're doing well.\n\nThis is a gentle reminder to reconfirm your joining date for the position of [Job Title] at [Company Name], scheduled for [Confirmed Start Date]. We are looking forward to welcoming you and beginning a rewarding journey together.\n\nPlease respond to this email confirming your availability, and let us know if you have any queries regarding the reporting details, onboarding documents, or other formalities.\n\nDetails:\n- Position: [Job Title]\n- Joining Date: [Confirmed Start Date]\n- Reporting Time & Location: [Time], [Office Address or Virtual Instructions]\n\nWishing you a smooth transition, and we’re excited to have you onboard!\n\nWarm regards,\n[Your Full Name]\nHR Team\n[Company Name]\n[Contact Information]"
         else:
             return body
 
 
-mail_sender: MailSenderProtocol = SimpleMailSender()
+class GMailSender:
+    def __init__(self, mail_api_url: str = "http://localhost:8083/mail/sendEmail"):
+        self.mail_api_url = mail_api_url
+
+    def send_mail(self, type: str = "", to: str = "", subject: str = "", body: str = "", reason: str = "", values: dict = {}) -> str:
+        # Prepare the API payload
+        payload = {
+            "to": to,
+            "templateId": self._get_template_id(type),
+            "subject": subject or self._get_default_subject(type),
+            "body": body or self._get_template_body(type),
+            "vars": values
+        }
+
+        try:
+            response = requests.post(self.mail_api_url, json=payload)
+            response.raise_for_status()
+            return f"{body or self._get_template_body(type)}"
+        except requests.exceptions.RequestException as e:
+            return f"Failed to send email to {to}: {str(e)}"
+
+    def _get_template_id(self, type: str) -> int:
+        template_map = {
+            "document_request": 1,
+            "offer_letter": 2,
+            "initiate_bgv": 0,
+            "confirm_joining_date": 0,
+            "appointment_letter": 0,
+            "reconfirm_joing_date": 0
+        }
+        return template_map.get(type, 1)
+
+    def _get_default_subject(self, type: str) -> str:
+        subject_map = {
+            "document_request": "Subject: Congratulations on Your Selection – Next Steps",
+            "offer_letter": "Subject: Offer Letter for Software Engineer – Welcome Aboard",
+            "initiate_bgv": "Subject: Request to Initiate Background Verification for Bikash Ranjan Pandey",
+            "confirm_joining_date": "Subject: Confirmation of Joining Date – Bikash Ranjan Pandey",
+            "appointment_letter": "Subject: Appointment Letter – Bikash Ranjan Pandey",
+            "reconfirm_joing_date": "Joining Date Reconfirmation"
+        }
+        return subject_map.get(type, "HR Communication")
+
+    def _get_template_body(self, type: str) -> str:
+        # Return the same template bodies as SimpleMailSender for consistency
+        simple_sender = SimpleMailSender()
+        return simple_sender.send_mail(type=type)
+
+
+# Change the default mail sender to use the API
+mail_sender: MailSenderProtocol = GMailSender()

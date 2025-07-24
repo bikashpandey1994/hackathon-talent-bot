@@ -176,9 +176,13 @@ public class MailServiceImpl implements MailService {
 						if (part.isMimeType("text/plain") && bodyContent.isEmpty()) {
 							bodyContent = part.getContent().toString();
 							System.out.println("bodyContent :: " + bodyContent);
-							messagesList.add(bodyContent);
-						}
+							// Attempt to extract only the reply portion (new content)
+							String[] parts = bodyContent.split("(?m)^On .* wrote:$");
+							String replyOnly = parts.length > 0 ? parts[0] : bodyContent;
+							System.out.println("🗨️ Replied Content Only: " + replyOnly);
 
+							messagesList.add(replyOnly);
+						}
 
 
 

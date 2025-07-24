@@ -116,6 +116,7 @@ const Dashboard = () => {
         setSearch={setSearch}
         search={search}
         onCandidatesLoaded={handleCandidatesLoaded}
+        onNavigateToDashboard={() => setShowUploader(false)}
       />
     </div>
   );

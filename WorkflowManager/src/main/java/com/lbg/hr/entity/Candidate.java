@@ -21,7 +21,7 @@ import lombok.Setter;
 
 
 @Entity
-@Table(name = "candidate", schema = "onboarding")
+@Table(name = "candidate")
 @Getter
 @Setter
 public class Candidate {
@@ -31,10 +31,8 @@ public class Candidate {
 
     private String name;
 
-    @Enumerated(EnumType.STRING)
-    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
-    @Column(name = "status", columnDefinition = "candidate_status")
-    private CandidateStatus status;
+    @Column(name = "status")
+    private String status;
 
     @Column(name = "interview_selection_date")
     private Date dateOfSelection;
@@ -69,10 +67,10 @@ public class Candidate {
 	public void setName(String name) {
 		this.name = name;
 	}
-	public CandidateStatus getStatus() {
+	public String getStatus() {
 		return status;
 	}
-	public void setStatus(CandidateStatus status) {
+	public void setStatus(String status) {
 		this.status = status;
 	}
 	public Date getDateOfSelection() {

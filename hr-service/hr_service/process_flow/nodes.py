@@ -45,6 +45,7 @@ def validate_document(state: CandidateState):
         state.update({"state": States.DOCUMENT_RECEIVED})
         return "release_offer"
     else:
+        state.update({"status": States.HR_INTERVENTION})
         return "hr_intervention"
 
 
