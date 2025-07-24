@@ -34,6 +34,9 @@ const ActionPopup = ({
   const [stateDetails, setStateDetails] = useState(null);
   const [loadingState, setLoadingState] = useState(false);
   const [stateError, setStateError] = useState(null);
+  const [summaryData, setSummaryData] = useState(null);
+  const [loadingSummary, setLoadingSummary] = useState(false);
+  const [summaryError, setSummaryError] = useState(null);
 
   // Initialize services
   useEffect(() => {
@@ -72,6 +75,28 @@ const ActionPopup = ({
       setLoadingState(false);
     }
   };
+
+  // Fetch candidate summary when ActionPopup is opened
+  useEffect(() => {
+    const fetchSummary = async () => {
+      if (isOpen && email) {
+        setLoadingSummary(true);
+        setSummaryError(null);
+        try {
+          const response = await hrService.getSummary(email, "");
+          setSummaryData(response.result || null);
+        } catch (error) {
+          setSummaryError(error.message || 'Failed to fetch summary');
+          setSummaryData(null);
+        } finally {
+          setLoadingSummary(false);
+        }
+      } else {
+        setSummaryData(null);
+      }
+    };
+    fetchSummary();
+  }, [isOpen, email]);
 
   const handleStatusChange = (e) => {
     setCandidateStatus(e.target.value);
@@ -150,7 +175,21 @@ const ActionPopup = ({
         <h3 style={{ color: '#219150', marginBottom: '1em' }}>{title}</h3>
         
         {/* Display candidate info if available */}
-        {candidateData.name && (
+        {loadingSummary ? (
+          <div style={{ marginBottom: '1.5em', padding: '1em', background: '#f9fff6', borderRadius: '6px', border: '1px solid #b2dfdb', color: '#888' }}>
+            Loading candidate information...
+          </div>
+        ) : summaryError ? (
+          <div style={{ marginBottom: '1.5em', padding: '1em', background: '#fff8f8', borderRadius: '6px', border: '1px solid #ffcdd2', color: '#d32f2f' }}>
+            Error loading candidate info: {summaryError}
+          </div>
+        ) : typeof summaryData === 'string' && summaryData.trim().length > 0 ? (
+          <div style={{ marginBottom: '1.5em', padding: '1em', background: '#f9fff6', borderRadius: '6px', border: '1px solid #b2dfdb' }}>
+            <h4 style={{ color: '#219150', marginBottom: '0.5em' }}>Candidate Summary</h4>
+            <div style={{ color: '#333', fontSize: '1em', whiteSpace: 'pre-line' }}>{summaryData}</div>
+            {email && <div style={{ marginTop: '0.5em' }}><b>Email:</b> {email}</div>}
+          </div>
+        ) : candidateData.name ? (
           <div style={{ marginBottom: '1.5em', padding: '1em', background: '#f9fff6', borderRadius: '6px', border: '1px solid #b2dfdb' }}>
             <h4 style={{ color: '#219150', marginBottom: '0.5em' }}>Candidate Information</h4>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.5em' }}>
@@ -161,12 +200,12 @@ const ActionPopup = ({
               {email && <div><b>Email:</b> {email}</div>}
             </div>
           </div>
-        )}
+        ) : null}
 
         {/* State Details Section */}
         <div style={{ marginBottom: '1.5em', padding: '1em', background: '#f0f8ff', borderRadius: '6px', border: '1px solid #b2dfdb' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5em' }}>
-            <h4 style={{ color: '#219150', margin: 0 }}>State Details</h4>
+            <h4 style={{ color: '#219150', margin: 0 }}>Last Email From Candidate</h4>
             <button
               onClick={fetchStateDetails}
               disabled={loadingState}

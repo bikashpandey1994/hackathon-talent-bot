@@ -194,6 +194,22 @@ class HRService {
     return await this.apiService.post('/hr-action', requestData);
   }
 
+
+  /**
+   * Get candidate summary information
+   * @param {string} threadId - Thread ID (email ID)
+   * @param {string} query - Query string (optional)
+   * @returns {Promise} Candidate summary result
+   */
+  async getSummary(threadId, query = "") {
+    const requestData = {
+      thread_id: threadId,
+      summary: true,
+      query: query
+    };
+    return await this.apiService.post('/summary', requestData);
+  }
+
   /**
    * Delete candidate from HR system
    * @param {string|number} candidateId - Candidate ID
