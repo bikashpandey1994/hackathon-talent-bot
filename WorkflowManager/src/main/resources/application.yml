@@ -14,7 +14,14 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
   application:
-    name: dashboard-service
+    name: workflow-manager
 
 server:
-  port: 8081
+  port: 8082
+hrService:
+  url: "http://localhost:8000"
+
+post:
+  api:
+    initendpoint: "http://localhost:8000/init"
+    resumeendpoint: "http://localhost:8000/resume"
